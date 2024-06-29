@@ -18,6 +18,7 @@ INSERT INTO cliente (nome,nomeSocial,genero,dataNascimento,documento,tipoDocumen
 							('Andressa','n\a','feminino','2001-02-06','998.732.612-89','CPF'),
 							('Amarildo','n\a','Masculino','1961-03-01','678.257.862-76','CPF'),
 							('Alessandro','n\a','Masculino','2005.12.08','249.359.167-65','CPF'),
+                            ('Valentina','n\a','Feminino','2003.12.08','222.359.167-65','CPF'),
 							('Gustavo','Xalalá','LGBT','2007.05.11','512.976.476.98','CPF');			                 
 
 			SELECT*FROM cliente;
