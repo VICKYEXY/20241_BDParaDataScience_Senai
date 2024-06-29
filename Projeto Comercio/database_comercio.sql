@@ -1,0 +1,3 @@
+DROP DATABASE comercio;
+
+CREATE DATABASE comercio;
