@@ -8,3 +8,6 @@ ORDER BY valor ASC
 SELECT*FROM produto WHERE valor >=100 OR valor ,= 300;
 SELECT *FROM produto ORDER BY valor ASC;
 SELECT*FROM produto WHERE nomeProduto LIKE 'carro%' OR nomeProduto LIKE 'notebook%';
+
+--QTDE de produtos em estoque
+SELECT SUM(quantidade) AS total_produtos FROM estoque;

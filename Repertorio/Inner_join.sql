@@ -26,3 +26,6 @@ GROUP BY uf
 ORDER BY Estado ASC;
 
 SELECT genero, COUNT(*) AS qtde_cliente FROM cliente
+GROUP BY genero
+ORDER BY qtde_cliente ASC;
+
