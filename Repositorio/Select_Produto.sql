@@ -39,3 +39,4 @@ SELECT c.nomeCategoria, AVG(p.valor) AS media_valor
 FROM produto P
 INNER JOIN categoria c ON p.id_categoria = c.id_categoria
 GROUP BY c.nomeCategoria;
+
