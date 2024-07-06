@@ -29,3 +29,21 @@ SELECT genero, COUNT(*) AS qtde_cliente FROM cliente
 GROUP BY genero
 ORDER BY qtde_cliente ASC;
 
+-- INNER JOIN PRODUTO
+
+--QTDE de produtos em estoque
+SELECT SUM(quantidade) AS total_produtos FROM estoque;
+
+-- Faturamento por mes
+SELECT MONTH(dataVenda) AS mes, YEAR(dataVenda) AS ano, SUM(ip.valorTotal) AS Faturamento_mensal FROM itemPedido ip
+INNER JOIN pedido P ON ip.id_pedido = p.id_pedido
+GROUP BY MONTH(dataVenda), YEAR(dataVenda)
+ORDER BY ano, mes;
+
+-- clientes que compraram acima de um determinado valor
+SELECT C.nome, SUM(ip.valorTotal) AS valor_total_compras FROM cliente C
+INNER JOIN pedido p ON c.id_cliente = p.id_cliente
+INNER JOIN itemPedido ip ON ip.id_pedido = p.id_pedido
+GROUP BY c.nome
+HAVING valor_total_compras > 2000;
+
