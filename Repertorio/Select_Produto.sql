@@ -33,3 +33,9 @@ INNER JOIN produto p ON ip.id_produto = p.id_produto
 INNER JOIN categoria c ON p.id_categoria = c.id_categoria
 GROUP BY c.nomeCategoria, p.nomeProduto
 ORDER BY c.nomeCategoria, qtde_vendida DESC;
+
+--media do valor dos produtos por categoria
+SELECT c.nomeCategoria, AVG(p.valor) AS media_valor
+FROM produto P
+INNER JOIN categoria c ON p.id_categoria = c.id_categoria
+GROUP BY c.nomeCategoria;
