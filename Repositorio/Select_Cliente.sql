@@ -47,10 +47,3 @@ ORDER BY qtde_cliente ASC;
 SELECT C.nome FROM cliente c 
 LEFT JOIN pedido p ON c.id_cliente=p.id_cliente
 WHERE p.id_cliente IS NULL;
-
---Clientes com mais de um endereco
-SELECT c.nome, COUNT(e.id_cliente) AS quantidade_endereco FROM cliente c 
-LEFT JOIN endereco e ON c.id_cliente = e.id_cliente
-GROUP BY c.nome
-HAVING quantidade_endereco > 1
-ORDER BY c.nome;
