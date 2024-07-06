@@ -28,6 +28,8 @@ GROUP BY c.nome
 HAVING valor_total_compras > 2000;
 
 -- produtos mais vendidos por categoria
-SELECT c.nomeCategoria, p.nomeProduto, SUM(ip.quantidade) FROM itemPedido ip 
+SELECT c.nomeCategoria, p.nomeProduto, SUM(ip.quantidade) AS qtde_vendida FROM itemPedido ip 
 INNER JOIN produto p ON ip.id_produto = p.id_produto
 INNER JOIN categoria c ON p.id_categoria = c.id_categoria
+GROUP BY c.nomeCategoria, p.nomeProduto
+ORDER BY c.nomeCategoria, qtde_vendida DESC;
