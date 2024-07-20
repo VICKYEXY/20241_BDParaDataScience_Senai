@@ -1,124 +1,117 @@
 import pyodbc
 
-# Replace with your connection details
-server = 'NOTEBOOK\SQLEXPRESS'
-database = 'comercio'
-username = ''
-password = ''
+# Função para conectar ao banco de dados
+def conectar():
+    try:
+        conexao = pyodbc.connect(
+            'DRIVER={ODBC Driver 17 for SQL Server};'
+            'SERVER=NOTEBOOK01;'
+            'DATABASE=comercio;'
+            'Trusted_Connection=Yes;'
+        )
+        return conexao
+    except Exception as e:
+        print(f"Erro ao conectar ao banco de dados: {e}")
+        return None
 
+# Função para inserir dados na tabela cliente
+def inserir_cliente(nome, nome_social, genero, data_nascimento, documento, tipo_documento):
+    conexao = conectar()
+    if conexao:
+        cursor = conexao.cursor()
+        try:
+            cursor.execute('''
+                INSERT INTO cliente (nome, nomeSocial, genero, dataNascimento, documento, tipoDocumento)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ''', (nome, nome_social, genero, data_nascimento, documento, tipo_documento))
+            conexao.commit()
+            print("Cliente inserido com sucesso!")
+        except Exception as e:
+            print(f"Erro ao inserir cliente: {e}")
+        finally:
+            cursor.close()
+            conexao.close()
 
-def connect_to_database():
-  """Connects to the SQL Server database and returns the connection object"""
-  connection_string = f'DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password}'
-  try:
-    connection = pyodbc.connect(connection_string)
-    return connection
-  except pyodbc.Error as ex:
-    print('Erro ao conectar:', ex)
-    return None
+# Função para atualizar dados na tabela cliente
+def atualizar_cliente(id_cliente, nome=None, nome_social=None, genero=None, data_nascimento=None, documento=None, tipo_documento=None):
+    conexao = conectar()
+    if conexao:
+        cursor = conexao.cursor()
+        try:
+            campos = []
+            valores = []
+            if nome:
+                campos.append("nome = ?")
+                valores.append(nome)
+            if nome_social:
+                campos.append("nomeSocial = ?")
+                valores.append(nome_social)
+            if genero:
+                campos.append("genero = ?")
+                valores.append(genero)
+            if data_nascimento:
+                campos.append("dataNascimento = ?")
+                valores.append(data_nascimento)
+            if documento:
+                campos.append("documento = ?")
+                valores.append(documento)
+            if tipo_documento:
+                campos.append("tipoDocumento = ?")
+                valores.append(tipo_documento)
+            
+            valores.append(id_cliente)
+            campos_str = ", ".join(campos)
+            sql = f"UPDATE cliente SET {campos_str} WHERE id_cliente = ?"
+            
+            cursor.execute(sql, valores)
+            conexao.commit()
+            print("Cliente atualizado com sucesso!")
+        except Exception as e:
+            print(f"Erro ao atualizar cliente: {e}")
+        finally:
+            cursor.close()
+            conexao.close()
 
+# Função para deletar dados na tabela cliente
+def deletar_cliente(id_cliente):
+    conexao = conectar()
+    if conexao:
+        cursor = conexao.cursor()
+        try:
+            cursor.execute("DELETE FROM cliente WHERE id_cliente = ?", id_cliente)
+            conexao.commit()
+            print("Cliente deletado com sucesso!")
+        except Exception as e:
+            print(f"Erro ao deletar cliente: {e}")
+        finally:
+            cursor.close()
+            conexao.close()
 
-def insert_cliente(nome, nome_social, genero, data_nascimento, documento, tipo_documento):
-  """Inserts a new client into the 'cliente' table"""
-  connection = connect_to_database()
-  if not connection:
-    return
+# Função para listar todos os clientes
+def listar_clientes():
+    conexao = conectar()
+    if conexao:
+        cursor = conexao.cursor()
+        try:
+            cursor.execute("SELECT * FROM cliente")
+            clientes = cursor.fetchall()
+            for cliente in clientes:
+                print(cliente)
+        except Exception as e:
+            print(f"Erro ao listar clientes: {e}")
+        finally:
+            cursor.close()
+            conexao.close()
 
-  cursor = connection.cursor()
-  try:
-    # Use parameterized query to prevent SQL injection attacks
-    sql = """INSERT INTO cliente (nome, nomeSocial, genero, dataNascimento, documento, tipoDocumento)
-              VALUES (?, ?, ?, ?, ?, ?)"""
-    cursor.execute(sql, (nome, nome_social, genero, data_nascimento, documento, tipo_documento))
-    connection.commit()
-    print("Cliente inserido com sucesso!")
-  except pyodbc.Error as ex:
-    print("Erro ao inserir cliente:", ex)
-  finally:
-    connection.close()
+# Exemplos de uso das funções
+# Inserir cliente
+inserir_cliente('Novo Cliente', 'n/a', 'Masculino', '1980-01-01', '123.456.789-00', 'CPF')
 
+# Atualizar cliente
+atualizar_cliente(1, nome='Cliente Atualizado')
 
-def update_cliente(id_cliente, nome=None, nome_social=None, genero=None, data_nascimento=None, documento=None, tipo_documento=None):
-  """Updates an existing client in the 'cliente' table"""
-  connection = connect_to_database()
-  if not connection:
-    return
+# Deletar cliente
+deletar_cliente(1)
 
-  cursor = connection.cursor()
-  try:
-    # Build the SET clause dynamically based on provided arguments
-    set_clause = ""
-    params = []
-    if nome:
-      set_clause += ", nome=?"
-      params.append(nome)
-    if nome_social:
-      set_clause += ", nomeSocial=?"
-      params.append(nome_social)
-    if genero:
-      set_clause += ", genero=?"
-      params.append(genero)
-    if data_nascimento:
-      set_clause += ", dataNascimento=?"
-      params.append(data_nascimento)
-    if documento:
-      set_clause += ", documento=?"
-      params.append(documento)
-    if tipo_documento:
-      set_clause += ", tipoDocumento=?"
-      params.append(tipo_documento)
-
-    if not set_clause:
-      print("Nenhum campo informado para atualização.")
-      return
-
-    # Remove the leading comma from the SET clause
-    set_clause = set_clause[1:]
-    sql = f"""UPDATE cliente SET {set_clause} WHERE id_cliente=?"""
-    params.append(id_cliente)
-    cursor.execute(sql, params)
-    connection.commit()
-    print(f"Cliente com ID {id_cliente} atualizado com sucesso!")
-  except pyodbc.Error as ex:
-    print("Erro ao atualizar cliente:", ex)
-  finally:
-    connection.close()
-
-
-def delete_cliente(id_cliente):
-  """Deletes a client from the 'cliente' table"""
-  connection = connect_to_database()
-  if not connection:
-    return
-
-  cursor = connection.cursor()
-  try:
-    sql = "DELETE FROM cliente WHERE id_cliente=?"
-    cursor.execute(sql, (id_cliente,))
-    connection.commit()
-    print(f"Cliente com ID {id_cliente} deletado com sucesso!")
-  except pyodbc.Error as ex:
-    print("Erro ao deletar cliente:", ex)
-  finally:
-    connection.close()
-
-
-def list_clientes():
-  """Lists all clients from the 'cliente' table"""
-  connection = connect_to_database()
-  if not connection:
-    return
-
-  cursor = connection.cursor()
-  try:
-    sql = "SELECT * FROM cliente"
-    cursor.execute(sql)
-    rows = cursor.fetchall()
-  except pyodbc.Error as ex:
-    print("Erro ao deletar cliente:", ex)
-    if not rows:
-      print("Nenhum cliente encontrado.")
-      return
-
-    print
-connect_to_database()
+# Listar clientes
+listar_clientes()
